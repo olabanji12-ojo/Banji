@@ -63,14 +63,14 @@ const Contact = () => {
               </div>
               <div>
                 <span className="text-xs text-gray-400 block mb-0.5">Email</span>
-                <span className="text-sm font-semibold text-gray-900 block mb-1">your@email.com</span>
+                <span className="text-sm font-semibold text-gray-900 block mb-1">emmanuelojo291@gmail.com</span>
                 <span className="text-xs text-gray-400 block">I reply within 2 hours</span>
               </div>
             </a>
 
             {/* Portfolio Card */}
             <a 
-              href="https://bjtoms.vercel.app" 
+              href="https://banji-three.vercel.app/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="bg-white border border-gray-100 rounded-xl p-4 flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5 transition duration-300 group"
@@ -80,7 +80,7 @@ const Contact = () => {
               </div>
               <div>
                 <span className="text-xs text-gray-400 block mb-0.5">Portfolio</span>
-                <span className="text-sm font-semibold text-gray-900 block mb-1">bjtoms.vercel.app</span>
+                <span className="text-sm font-semibold text-gray-900 block mb-1">banji-three.vercel.app</span>
                 <span className="text-xs text-gray-400 block">See all my work here</span>
               </div>
             </a>
