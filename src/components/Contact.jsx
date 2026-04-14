@@ -1,8 +1,76 @@
-import React from 'react';
-import { MessageCircle, Mail, Globe } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, Mail, Globe, DownloadCloud } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Swal from 'sweetalert2';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    business: '',
+    status: '',
+    message: ''
+  });
+
+  const [isSending, setIsSending] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.message.trim() || !formData.business || !formData.status) return false;
+    if (!formData.email.trim() || !emailRegex.test(formData.email)) return false;
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Input',
+        text: 'Please fill out all fields correctly.',
+        confirmButtonColor: '#3b82f6',
+      });
+      return;
+    }
+
+    setIsSending(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xdklqkde', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Message Sent!',
+          text: 'Thank you for your message. I’ll get back to you soon!',
+          confirmButtonColor: '#3b82f6',
+        });
+        setFormData({ name: '', phone: '', email: '', business: '', status: '', message: '' });
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong. Please try again or email me directly.',
+        confirmButtonColor: '#3b82f6',
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <section id="contact" className="bg-[#F9FAFB] py-24">
       <div className="max-w-5xl mx-auto px-6">
@@ -84,6 +152,22 @@ const Contact = () => {
                 <span className="text-xs text-gray-400 block">See all my work here</span>
               </div>
             </a>
+
+            {/* Document Download Card */}
+            <a 
+              href="/services.docx" 
+              download="Banji_Services.docx"
+              className="bg-brand-primary border border-brand-primary rounded-xl p-4 flex items-start gap-4 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 group-hover:bg-white transition-colors">
+                <DownloadCloud size={20} className="text-white group-hover:text-brand-primary transition-colors" />
+              </div>
+              <div>
+                <span className="text-xs text-brand-light block mb-0.5">Brochure</span>
+                <span className="text-sm font-semibold text-white block mb-1">Download My Services</span>
+                <span className="text-xs text-brand-light block">Word Document (Click to save)</span>
+              </div>
+            </a>
           </motion.div>
 
           {/* RIGHT COLUMN - Contact Form */}
@@ -94,30 +178,30 @@ const Contact = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
           >
-            <form className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               
               {/* Row 1: Name and Phone */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="name" className="text-sm font-medium text-gray-700 mb-1.5 block">Full Name</label>
-                  <input type="text" id="name" name="name" required placeholder="John Doe" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
+                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="John Doe" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
                 </div>
                 <div>
                   <label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-1.5 block">Phone Number</label>
-                  <input type="tel" id="phone" name="phone" required placeholder="0902 XXX XXXX" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
+                  <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} required placeholder="0902 XXX XXXX" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
                 </div>
               </div>
 
               {/* Row 2: Email */}
               <div>
                 <label htmlFor="email" className="text-sm font-medium text-gray-700 mb-1.5 block">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="john@example.com" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@example.com" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white placeholder-gray-400" />
               </div>
 
               {/* Row 3: Business Type Select */}
               <div>
                 <label htmlFor="business" className="text-sm font-medium text-gray-700 mb-1.5 block">What type of business do you have?</label>
-                <select id="business" name="business" required defaultValue="" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
+                <select id="business" name="business" value={formData.business} onChange={handleChange} required className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
                   <option value="" disabled>Select business type</option>
                   <option value="Plumbing">Plumbing</option>
                   <option value="Roofing">Roofing</option>
@@ -132,7 +216,7 @@ const Contact = () => {
               {/* Row 4: Current Website Status Select */}
               <div>
                 <label htmlFor="status" className="text-sm font-medium text-gray-700 mb-1.5 block">Do you currently have a website?</label>
-                <select id="status" name="status" required defaultValue="" className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
+                <select id="status" name="status" value={formData.status} onChange={handleChange} required className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer">
                   <option value="" disabled>Select status</option>
                   <option value="none">No, I have nothing yet</option>
                   <option value="social_only">I have a Facebook/Instagram page only</option>
@@ -146,6 +230,8 @@ const Contact = () => {
                 <textarea 
                   id="message" 
                   name="message" 
+                  value={formData.message} 
+                  onChange={handleChange} 
                   rows="4" 
                   required 
                   placeholder="Where are you based? What services do you offer? Any specific things you want on your site?" 
@@ -156,9 +242,10 @@ const Contact = () => {
               {/* Submit Button */}
               <button 
                 type="submit" 
-                className="mt-2 bg-brand-primary text-white font-semibold py-4 rounded-xl w-full hover:bg-brand-dark transition-colors active:scale-[0.98] shadow-lg shadow-brand-primary/20"
+                disabled={isSending}
+                className="mt-2 bg-brand-primary text-white font-semibold py-4 rounded-xl w-full hover:bg-brand-dark transition-colors active:scale-[0.98] shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send message — let's get started
+                {isSending ? 'Sending message...' : "Send message — let's get started"}
               </button>
             </form>
           </motion.div>
